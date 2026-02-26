@@ -18,6 +18,7 @@ interface AuthContextValue extends AuthState {
   setAuth: (token: string, user: { id: string; email: string }) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  loaded: boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -26,6 +27,7 @@ const STORAGE_KEY = "hemi_auth";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({ token: null, user: null });
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     try {
@@ -37,12 +39,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       /* ignore */
     }
+    setLoaded(true);
   }, []);
 
   const setAuth = useCallback(
     (token: string, user: { id: string; email: string }) => {
       const next: AuthState = { token, user };
       setState(next);
+      setLoaded(true);
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     },
     []
@@ -60,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAuth,
         logout,
         isAuthenticated: !!state.token,
+        loaded,
       }}
     >
       {children}

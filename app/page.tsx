@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 
 export default function Home() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loaded } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    router.replace(isAuthenticated ? "/overview" : "/login");
-  }, [isAuthenticated, router]);
+    if (loaded) {
+      router.replace(isAuthenticated ? "/overview" : "/login");
+    }
+  }, [loaded, isAuthenticated, router]);
 
   return null;
 }

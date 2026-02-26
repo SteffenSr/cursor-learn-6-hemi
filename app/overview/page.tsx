@@ -32,7 +32,7 @@ function groupByAttention(patients: Patient[]) {
 }
 
 export default function OverviewPage() {
-  const { token, user, isAuthenticated, logout } = useAuth();
+  const { token, user, isAuthenticated, logout, loaded } = useAuth();
   const router = useRouter();
 
   const [patients, setPatients] = useState<Patient[]>([]);
@@ -44,10 +44,10 @@ export default function OverviewPage() {
   const [filterLevel, setFilterLevel] = useState("");
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (loaded && !isAuthenticated) {
       router.replace("/login");
     }
-  }, [isAuthenticated, router]);
+  }, [loaded, isAuthenticated, router]);
 
   const fetchPatients = useCallback(async () => {
     if (!token) return;
@@ -97,7 +97,7 @@ export default function OverviewPage() {
     low: "Stable",
   };
 
-  if (!isAuthenticated) return null;
+  if (!loaded || !isAuthenticated) return null;
 
   return (
     <>
